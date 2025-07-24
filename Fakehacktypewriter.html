@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manual Hacker</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: #00FF00;
+      font-family: monospace;
+      font-size: 16px;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #console {
+      white-space: pre-wrap;
+      padding: 10px;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 1em;
+      background: #00FF00;
+      animation: blink 1s step-start infinite;
+    }
+    @keyframes blink {
+      50% { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="console"></div>
+  <script>
+    const consoleEl = document.getElementById('console');
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    consoleEl.appendChild(cursor);
+
+    let output = '';  // 当前输出的内容
+    let pointer = 0;  // 当前要显示的位置
+    let content = ''; // GitHub 内容将加载到这里
+
+    const githubFiles = [
+      "https://raw.githubusercontent.com/vinta/awesome-python/master/README.md",
+      "https://raw.githubusercontent.com/torvalds/linux/master/README",
+      "https://raw.githubusercontent.com/python/cpython/main/Lib/random.py",
+      "https://raw.githubusercontent.com/psf/requests/main/requests/api.py"
+    ];
+
+    async function fetchRandomFile() {
+      const url = githubFiles[Math.floor(Math.random() * githubFiles.length)];
+      const response = await fetch(url);
+      return await response.text();
+    }
+
+    function showNextChar() {
+      if (pointer < content.length) {
+        const char = content[pointer++];
+        cursor.before(char);
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      // 忽略功能键（F1-F12、Alt、Ctrl、Shift 等）
+      if (e.key.length === 1 || e.code.startsWith('Key') || e.code.startsWith('Digit')) {
+        showNextChar();
+      }
+    });
+
+    fetchRandomFile().then(text => {
+      content = text;
+    });
+  </script>
+</body>
+</html>
