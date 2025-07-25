@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hacker Console</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: #00FF00;
+      font-family: monospace;
+      font-size: 16px;
+      overflow: hidden;
+    }
+    #console {
+      white-space: pre-wrap;
+      padding: 10px;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      background: #00FF00;
+      animation: blink 1s step-start infinite;
+    }
+    @keyframes blink {
+      50% { background: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div id="console"></div>
+  <script>
+    const consoleEl = document.getElementById('console');
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    consoleEl.appendChild(cursor);
+
+    const githubFiles = [
+      "https://raw.githubusercontent.com/vinta/awesome-python/master/README.md",
+      "https://raw.githubusercontent.com/torvalds/linux/master/README",
+      "https://raw.githubusercontent.com/python/cpython/main/Lib/random.py",
+      "https://raw.githubusercontent.com/psf/requests/main/requests/api.py"
+    ];
+
+    async function fetchRandomFile() {
+      const url = githubFiles[Math.floor(Math.random() * githubFiles.length)];
+      const response = await fetch(url);
+      return await response.text();
+    }
+
+    async function typeLikeHacker(text) {
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        cursor.before(char);
+        await new Promise(resolve => setTimeout(resolve, Math.random() * 30 + 10)); // 10-40ms
+        if (i % 200 === 0) {
+          // 滚动到底部
+          consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+      }
+    }
+
+    fetchRandomFile().then(content => typeLikeHacker(content));
+  </script>
+</body>
+</html>
